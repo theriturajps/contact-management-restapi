@@ -43,7 +43,10 @@ const userModel = new mongoose.Schema({
 			type: mongoose.Schema.ObjectId,
 			ref: "Contact"
 		}
-	]
+	],
+	refreshToken: {
+		type: String
+	}
 }, {
 	timestamps: true
 })

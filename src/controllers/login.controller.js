@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
 import { User } from "../models/user.model.js"
-import { generateAccessTokens } from "../utils/generateToken.utils.js"
+import { generateAccessTokens, generateRefreshTokens } from "../utils/generateToken.utils.js"
 
 export const loginController = async (req, res) => {
 
@@ -35,18 +35,30 @@ export const loginController = async (req, res) => {
 
 	if (email === userData.email && isPasswordMatched) {
 
-		const accessToken = generateAccessTokens({ email: userData.email, userId: userData._id }, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRY)
+		const accessWalaToken = generateAccessTokens({ email: userData.email, userId: userData._id }, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRY)
+		const refreshWalaToken = generateRefreshTokens({ userId: userData._id }, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRY)
 
-		return res.status(200).json({
-			success: true,
-			message: `Hello ${userData.fullName}, Authentication successful!!!`,
-			user: {
-				id: userData._id,
-				name: userData.fullName,
-				email: userData.email
-			},
-			token: accessToken
-		})
+		userData.refreshToken = refreshWalaToken
+		await userData.save({ validateBeforeSave: false })
+
+		const cookieOptions = {
+			httpOnly: true,
+			secure: true
+		}
+
+		return res.status(200)
+			.cookie("accessToken", accessWalaToken, cookieOptions)
+			.cookie("refreshToken", refreshWalaToken, cookieOptions)
+			.json({
+				success: true,
+				message: `Hello ${userData.fullName}, Authentication successful!!!`,
+				user: {
+					id: userData._id,
+					name: userData.fullName,
+					email: userData.email
+				},
+				token: accessWalaToken
+			})
 	}
 
 }
