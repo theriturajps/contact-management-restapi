@@ -1,11 +1,12 @@
-import { getContactById, createNewContent, deleteContact, updatedContact } from "../controllers/contact.controller.js";
-import { Router } from "express";
+import { multerImage } from "../utils/multerUpload.utils.js"
+import { getContactById, createNewContent, deleteContact, updatedContact } from "../controllers/contact.controller.js"
+import { Router } from "express"
 
 const contactRouter = Router()
 
 contactRouter.get('/:id', getContactById) // contacts by id
 
-contactRouter.post('/:id/new', createNewContent) // create new contact
+contactRouter.post('/:id/new', multerImage.none(), createNewContent) // create new contact
 
 contactRouter.delete('/:id', deleteContact) // delete the contact
 
