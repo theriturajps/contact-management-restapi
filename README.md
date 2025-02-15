@@ -9,16 +9,14 @@ The **Contact Management REST API** provides a simple and secure way to manage u
 - ➥ ⚡ Fast and efficient data handling
 - ➥ 📡 Scalable and extendable architecture
 
-
-## Base Endpoint
-
-`{ENDPOINT}` **➠** `/api/v1`
-
 ### 🔐 Authentication
 - ➽ **POST** `/login` **➠** User login
 - ➽ **POST** `/signup` **➠** User registration
 
 ### 📋 Contact Management
+
+`{ENDPOINT}` **➠** `/api/v1`
+
 - ➽ **GET** `/contact/all` 🔒 **➠** Fetch all contact details
 - ➽ **GET** `/contact/:id` 🔒 **➠** Fetch contact details by ID
 - ➽ **POST** `/contact/new` 🔒 **➠** Create a new contact
