@@ -3,7 +3,7 @@ import { Contact } from "../models/contact.model.js"
 
 export const getContactById = async (req, res) => {
 	const userId = req.params.id
-	const userData = await User.findById(userId).select('-password -whatRole -gender -email -phoneNumber -profileImage')
+	const userData = await User.findById(userId).select('-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken')
 	if (userData.contacts.length === 0) {
 		return res.status(404).json({
 			success: false,
@@ -19,7 +19,7 @@ export const getContactById = async (req, res) => {
 
 export const createNewContent = async (req, res) => {
 	const userId = req.params.id
-	const userData = await User.findById(userId).select('-password -whatRole -gender -email -phoneNumber -profileImage')
+	const userData = await User.findById(userId).select('-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken')
 
 	if (!userData) {
 		return res.status(404).json({
