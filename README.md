@@ -1,5 +1,7 @@
 # Contact Management REST API
 
+The **Contact Management REST API** provides a simple and secure way to manage user contacts. It allows users to **register**, **log in**, and perform various operations on their stored contacts, such as **retrieving**, **adding**, **updating**, and **deleting** contact details. This API follows RESTful principles and requires authentication for managing contacts.
+
 ## Base Endpoint
 
 `{ENDPOINT}` **-** `/api/v1`
