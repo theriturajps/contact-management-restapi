@@ -44,7 +44,7 @@ export const getContactById = async (req, res) => {
 };
 
 export const createNewContent = async (req, res) => {
-	const userId = req.params.id
+	const userId = req.userData?.userId;
 	const userData = await User.findById(userId).select('-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken')
 
 	if (!userData) {

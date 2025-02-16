@@ -7,12 +7,13 @@ const contactRouter = Router()
 
 contactRouter.get('/all', checkAuthToken, getContactById) // contacts by id
 
-contactRouter.post('/:id/new', multerImage.none(), createNewContent) // create new contact
+contactRouter.post('/:id/new', checkAuthToken, multerImage.none(), createNewContent) // create new contact
+
+contactRouter.post('/newtoken', newRefreshTokens) // renew refresh token
 
 contactRouter.delete('/:id', deleteContact) // delete the contact
 
 contactRouter.patch('/:id', updatedContact) // update the contact
 
-contactRouter.post('/newtoken', newRefreshTokens) // renew refresh token
 
 export default contactRouter

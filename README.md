@@ -15,13 +15,14 @@ The **Contact Management REST API** provides a simple and secure way to manage u
 
 ### 📋 Contact Management
 
-`{ENDPOINT}` **➠** `/api/v1`
+`{ENDPOINT}` **➠** `/api/v1/contact`
 `{:id}` **➠** User Id
 
-- ➽ **GET** `/contact/all` 🔒 **➠** Fetch all contact details
-- ➽ **POST** `/contact/:id/new` 🔒 **➠** Create a new contact
-- ➽ **DELETE** `/contact/:id` 🔒 **➠** Delete a contact
-- ➽ **PATCH** `/contact/:id` 🔒 **➠** Update a contact
+- ➽ **GET** `/all` 🔒 **➠** Fetch all contact details
+- ➽ **POST** `/:id/new` 🔒 **➠** Create a new contact
+- ➽ **POST** `/newtoken` 🔒 **➠** Renew the access token
+- ➽ **DELETE** `/:id` 🔒 **➠** Delete a contact
+- ➽ **PATCH** `/:id` 🔒 **➠** Update a contact
 
 ---
 🚀 **Secure endpoints** (🔒) require authentication.
