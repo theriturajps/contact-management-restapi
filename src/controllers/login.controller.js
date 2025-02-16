@@ -7,7 +7,7 @@ export const loginController = async (req, res) => {
 	const { email, password } = req.body
 
 	if ([email, password].some(el => el.trim() === '')) {
-		res.status(401).json({
+		return res.status(401).json({
 			success: false,
 			message: 'Missing required fields: email and password are required'
 		})
