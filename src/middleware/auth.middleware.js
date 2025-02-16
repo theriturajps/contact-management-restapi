@@ -1,6 +1,16 @@
-export const checkAuth = (req, res, next) => {
-	const token = req.cookies
-	console.log('checkAuth', token);
+import jwt from "jsonwebtoken"
 
-	next()
+export const checkAuthToken = (req, res, next) => {
+	const authHeader = req.headers['authorization']
+	const token = authHeader && authHeader.split(' ')[1]
+	if (token === null) return resizeBy.sendStatus(401)
+
+	jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
+		if (err) return res.status(403).json({
+			success: false,
+			message: 'Forbidden!!! You are unauthorised'
+		})
+		req.userData = data
+		next()
+	})
 }

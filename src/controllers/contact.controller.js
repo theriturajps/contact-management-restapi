@@ -1,21 +1,43 @@
+import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js"
 import { Contact } from "../models/contact.model.js"
 
 export const getContactById = async (req, res) => {
-	const userId = req.params.id
-	const userData = await User.findById(userId).select('-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken')
-	if (userData.contacts.length === 0) {
-		return res.status(404).json({
+
+	const token = req.cookies?.accessToken
+
+	const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+
+	const userId = decodedToken?.userId
+
+	if (!token) {
+		return res.status(401).json({
 			success: false,
-			message: 'Request successful, but no content to return',
+			message: 'Unauthorized request',
+		})
+	}
+
+	const userData = await User.findById(userId).select("-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken")
+
+	if (!userData) {
+		return res.status(401).json({
+			success: false,
+			message: 'Invalid Access Token',
+		})
+	}
+
+	if (userData.contacts) {
+		return res.status(200).json({
+			success: true,
+			message: 'Request successful',
 			user: {
-				id: userData._id,
-				name: userData.fullName
+				id: userData.userId,
+				name: userData.fullName,
+				contact: userData.contacts
 			}
 		})
 	}
 }
-
 
 export const createNewContent = async (req, res) => {
 	const userId = req.params.id
