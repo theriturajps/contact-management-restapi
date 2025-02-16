@@ -43,11 +43,12 @@ export const loginController = async (req, res) => {
 
 		const cookieOptions = {
 			httpOnly: true,
-			secure: true
+			secure: true,
+			sameSite: "Strict"
 		}
 
 		return res.status(200)
-			.cookie("accessToken", accessWalaToken, cookieOptions)
+			.cookie("iAmAccessToken", accessWalaToken, cookieOptions)
 			.json({
 				success: true,
 				message: `Hello ${userData.fullName}, Authentication successful!!!`,
@@ -55,8 +56,7 @@ export const loginController = async (req, res) => {
 					id: userData._id,
 					name: userData.fullName,
 					email: userData.email
-				},
-				token: accessWalaToken
+				}
 			})
 	}
 

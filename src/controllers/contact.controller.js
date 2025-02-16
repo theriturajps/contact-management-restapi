@@ -3,41 +3,44 @@ import { User } from "../models/user.model.js"
 import { Contact } from "../models/contact.model.js"
 
 export const getContactById = async (req, res) => {
+	try {
 
-	const token = req.cookies?.accessToken
+		const userId = req.userData?.userId;
 
-	const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+		if (!userId) {
+			return res.status(401).json({
+				success: false,
+				message: 'Invalid Access Token',
+			});
+		}
 
-	const userId = decodedToken?.userId
+		const userData = await User.findById(userId).select("-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken");
 
-	if (!token) {
-		return res.status(401).json({
-			success: false,
-			message: 'Unauthorized request',
-		})
-	}
+		if (!userData) {
+			return res.status(404).json({
+				success: false,
+				message: 'Sorry!!! User not found',
+			});
+		}
 
-	const userData = await User.findById(userId).select("-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken")
-
-	if (!userData) {
-		return res.status(401).json({
-			success: false,
-			message: 'Invalid Access Token',
-		})
-	}
-
-	if (userData.contacts) {
 		return res.status(200).json({
 			success: true,
 			message: 'Request successful',
 			user: {
-				id: userData.userId,
+				id: userData._id,
 				name: userData.fullName,
-				contact: userData.contacts
-			}
-		})
+				contact: userData.contacts || [],
+			},
+		});
+
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({
+			success: false,
+			message: 'Internal Server Error',
+		});
 	}
-}
+};
 
 export const createNewContent = async (req, res) => {
 	const userId = req.params.id
