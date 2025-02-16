@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js"
 import { Contact } from "../models/contact.model.js"
+import { generateAccessTokens, generateRefreshTokens } from "../utils/generateToken.utils.js"
 
 export const getContactById = async (req, res) => {
 	try {
@@ -88,3 +89,63 @@ export const createNewContent = async (req, res) => {
 export const deleteContact = async (req, res) => { }
 
 export const updatedContact = async (req, res) => { }
+
+export const newRefreshTokens = async (req, res) => {
+
+	const incomingRefreshToken = req.cookies.iAmRefreshToken || req.body.refreshToken
+
+	if (!incomingRefreshToken) {
+		return res.status(401).json({
+			success: false,
+			message: 'Unauthorized request!!!',
+		});
+	}
+
+	try {
+		const decodedRefreshToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+		const userData = await User.findById(decodedRefreshToken?.userId).select('-password -whatRole')
+
+		console.log(userData);
+
+		if (!userData) {
+			return res.status(401).json({
+				success: false,
+				message: 'Invalid refresh token'
+			})
+		}
+
+		if (incomingRefreshToken !== userData?.refreshToken) {
+			return res.status(401).json({
+				success: false,
+				message: 'Refresh token is expired or used'
+			})
+		}
+
+		const options = {
+			httpOnly: true,
+			secure: true,
+			sameSite: "Strict"
+		}
+
+		const newAccessToken = generateAccessTokens({ email: userData.email, userId: userData._id }, process.env.ACCESS_TOKEN_SECRET, process.env.ACCESS_TOKEN_EXPIRY)
+		const newRefreshToken = generateRefreshTokens({ userId: userData._id }, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRY)
+
+		userData.refreshToken = newRefreshToken
+		await userData.save({ validateBeforeSave: false })
+
+		return res
+			.status(200)
+			.cookie("iAmAccessToken", newAccessToken, options)
+			.json({
+				success: true,
+				message: 'Access token refreshed',
+				accessToken: newAccessToken
+			})
+	} catch (error) {
+		return res.status(401).json({
+			success: false,
+			message: `Invalid refresh token ${error.message}`
+		})
+	}
+}
