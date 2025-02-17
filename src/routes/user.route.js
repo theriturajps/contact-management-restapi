@@ -12,6 +12,6 @@ userRouter.post('/login', multerImage.none(), loginController)
 userRouter.post('/signup', multerImage.single('profileImage'), signupController)
 userRouter.post('/newtoken', checkAuthToken, newRefreshTokens) // renew refresh token
 
-userRouter.post('/:id/delete', checkAuthToken, deleteController)
+userRouter.delete('/:id/delete', checkAuthToken, deleteController)
 
 export default userRouter
