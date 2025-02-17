@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: "16kb" }))
 app.use(cookieParser())
 
-app.use('/', userRouter)
+app.use('/user', userRouter)
 app.use('/api/v1/contact', contactRouter)
 
 export { app }

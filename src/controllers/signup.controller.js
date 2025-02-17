@@ -6,12 +6,12 @@ const saltrounds = Number(process.env.BCRYPT_SALT_ROUND)
 
 export const signupController = async (req, res) => {
 
-	const { name, email, password, number, gender } = req.body
+	const { fullName, email, password, phoneNumber, gender } = req.body
 
-	if ([name, email, password, number, gender].some(el => el.trim() === '')) {
+	if ([fullName, email, password, phoneNumber, gender].some(el => el?.trim() === '')) {
 		res.status(401).json({
 			success: false,
-			message: 'Missing required fields: fullname, email, password, number and gender are required'
+			message: 'Missing required fields: fullname, email, password, phoneNumber and gender are required'
 		})
 	}
 
@@ -26,10 +26,10 @@ export const signupController = async (req, res) => {
 	const hashedPassword = await bcrypt.hash(password, saltrounds)
 
 	const userData = {
-		fullName: name,
+		fullName,
 		email,
 		password: hashedPassword,
-		phoneNumber: number,
+		phoneNumber,
 		gender
 	}
 
@@ -47,17 +47,24 @@ export const signupController = async (req, res) => {
 		}
 	}
 
-	const saveUserData = await User(userData)
-	saveUserData.save()
+	try {
+		const saveUserData = await User(userData)
+		saveUserData.save()
 
-	res.status(200).json({
-		success: true,
-		message: "User registration successful",
-		data: {
-			id: saveUserData._id,
-			name: saveUserData.fullName,
-			email: saveUserData.email
-		}
-	})
+		res.status(200).json({
+			success: true,
+			message: "User registration successful",
+			data: {
+				id: saveUserData._id,
+				name: saveUserData.fullName,
+				email: saveUserData.email
+			}
+		})
+	} catch (error) {
+		res.status(400).json({
+			success: false,
+			message: "User registration unsuccessful"
+		})
+	}
 
 }
