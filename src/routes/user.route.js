@@ -10,7 +10,8 @@ const userRouter = Router()
 
 userRouter.post('/login', multerImage.none(), loginController)
 userRouter.post('/signup', multerImage.single('profileImage'), signupController)
+userRouter.post('/newtoken', checkAuthToken, newRefreshTokens) // renew refresh token
+
 userRouter.post('/:id/delete', checkAuthToken, deleteController)
-userRouter.post('/newtoken', newRefreshTokens) // renew refresh token
 
 export default userRouter
