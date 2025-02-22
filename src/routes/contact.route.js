@@ -1,11 +1,11 @@
 import { checkAuthToken } from "../middleware/auth.middleware.js"
 import { multerImage } from "../utils/multerUpload.utils.js"
-import { getContactById, createNewContent, deleteContact, updatedContact } from "../controllers/contact.controller.js"
+import { getAllContact, createNewContent, deleteContact, updatedContact } from "../controllers/contact.controller.js"
 import { Router } from "express"
 
 const contactRouter = Router()
 
-contactRouter.get('/all', checkAuthToken, getContactById) // contacts by id
+contactRouter.get('/all', checkAuthToken, getAllContact) // contacts by id
 
 contactRouter.post('/new', checkAuthToken, multerImage.none(), createNewContent) // create new contact for the user id
 

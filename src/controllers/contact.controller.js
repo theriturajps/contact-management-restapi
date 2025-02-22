@@ -1,9 +1,8 @@
 import { User } from "../models/user.model.js"
 import { Contact } from "../models/contact.model.js"
 
-export const getContactById = async (req, res) => {
+export const getAllContact = async (req, res) => {
 	try {
-
 		const userId = req.userData?.userId;
 
 		if (!userId) {

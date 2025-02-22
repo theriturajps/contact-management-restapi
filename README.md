@@ -21,6 +21,7 @@ The **Contact Management REST API** provides a simple and secure way to manage u
 ### 📋 Contact Management
 
 `{ENDPOINT}` **➠** `/api/v1/contact`
+`{:id}` **➠** User Id
 
 - ➽ **GET** `/all` 🔒 **➠** Fetch all contact details
 - ➽ **POST** `/new` 🔒 **➠** Create a new contact for user
