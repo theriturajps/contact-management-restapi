@@ -13,7 +13,7 @@ export const getContactById = async (req, res) => {
 			});
 		}
 
-		const userData = await User.findById(userId).select("-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken");
+		const userData = await User.findById(userId).select("-profileimg -createdAt -updatedAt -__v -password -whatRole -gender -email -phoneNumber -profileImage -refreshToken");
 
 		if (!userData) {
 			return res.status(404).json({
@@ -22,14 +22,18 @@ export const getContactById = async (req, res) => {
 			});
 		}
 
+		const allContacts = await Promise.all(
+			userData.contacts.map(contact => Contact.findById(contact).select("-createdAt -updatedAt -__v"))
+		);
+
 		return res.status(200).json({
 			success: true,
 			message: 'Request successful',
 			user: {
-				id: userData._id,
-				name: userData.fullName,
-				contact: userData.contacts || [],
+				userId: userData._id,
+				userFullName: userData.fullName
 			},
+			contacts: allContacts
 		});
 
 	} catch (error) {

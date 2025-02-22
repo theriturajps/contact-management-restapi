@@ -12,12 +12,11 @@ The **Contact Management REST API** provides a simple and secure way to manage u
 ### 🔐 Authentication
 
 `{ENDPOINT}` **➠** `/user`
-`{:id}` **➠** User Id
 
 - ➽ **POST** `/login` **➠** User login
 - ➽ **POST** `/signup` **➠** User registration
 - ➽ **POST** `/newtoken` 🔒 **➠** Renew the access token
-- ➽ **DELETE** `/:id/delete` 🔒 **➠** Delete user from database
+- ➽ **DELETE** `/delete` 🔒 **➠** Delete user from database
 
 ### 📋 Contact Management
 
