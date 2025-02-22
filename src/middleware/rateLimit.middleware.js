@@ -20,7 +20,7 @@ const rateLimit = (options = {}) => {
 		keyGenerator = (req) => (options.trustProxy ? req.ip : req.connection.remoteAddress), // Default: IP-based
 		handler = (req, res) => res.status(429).json({ message: 'Too many requests, please try again later.' }),
 		onLimitReached = (key) => console.log(`Rate limit reached for key: ${key}`),
-		trustProxy = false, // Trust proxy headers for IP
+		trustProxy = false, // Trust proxy headers for IP address (X-Forwarded-For)
 	} = options;
 
 	return (req, res, next) => {
