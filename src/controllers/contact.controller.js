@@ -60,7 +60,7 @@ export const createNewContent = async (req, res) => {
 		const saveContact = new Contact(newContact)
 		await saveContact.save()
 
-		userData.contacts.push(saveContact._id)
+		userData.contacts.push(saveContact)
 		await userData.save()
 
 		res.status(201).json({
