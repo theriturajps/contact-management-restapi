@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import { generateAccessTokens, generateRefreshTokens } from "../utils/generateToken.utils.js"
 import { User } from "../models/user.model.js"
 
-export const deleteController = async (req, res) => {
+export const deleteUserController = async (req, res) => {
 	const userId = req.userData.userId
 
 	const userData = await User.findById(userId)
