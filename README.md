@@ -24,7 +24,7 @@ The **Contact Management REST API** provides a simple and secure way to manage u
 `{ENDPOINT}` **➠** `/api/v1/contact`
 
 - ➽ **GET** `/all` 🔒 **➠** Fetch all contact details
-- ➽ **POST** `/:id/new` 🔒 **➠** Create a new contact
+- ➽ **POST** `/new` 🔒 **➠** Create a new contact for user
 - ➽ **DELETE** `/:id` 🔒 **➠** Delete a contact
 - ➽ **PATCH** `/:id` 🔒 **➠** Update a contact
 

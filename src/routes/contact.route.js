@@ -7,7 +7,7 @@ const contactRouter = Router()
 
 contactRouter.get('/all', checkAuthToken, getContactById) // contacts by id
 
-contactRouter.post('/:id/new', checkAuthToken, multerImage.none(), createNewContent) // create new contact
+contactRouter.post('/new', checkAuthToken, multerImage.none(), createNewContent) // create new contact for the user id
 
 contactRouter.delete('/:id', deleteContact) // delete the contact
 

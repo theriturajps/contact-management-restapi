@@ -42,46 +42,41 @@ export const getContactById = async (req, res) => {
 };
 
 export const createNewContent = async (req, res) => {
+	const { contactName, contactNumber, contactEmail, contactPincode, contactGender, contactProfileImage } = req.body
 	const userId = req.userData?.userId;
-	const userData = await User.findById(userId).select('-password -whatRole -gender -email -phoneNumber -profileImage -refreshToken')
 
-	if (!userData) {
-		return res.status(404).json({
-			message: 'User not exist!! Please check the credentials.',
-			success: false
-		})
+	const userData = await User.findById(userId).select("-password -whatRole -refreshToken -phoneNumber -email")
+
+	const newContact = {
+		fullName: contactName,
+		email: contactEmail,
+		phoneNumber: contactNumber,
+		pincode: contactPincode,
+		gender: contactGender,
+		profileimg: contactProfileImage
 	}
-
-	const { fullName, email, phoneNumber, pincode, gender, profileimg } = req.body
-
-	const userContact = { fullName, email, phoneNumber, pincode, gender, profileimg }
 
 	try {
-		const saveContact = new Contact(userContact)
+		const saveContact = new Contact(newContact)
 		await saveContact.save()
-		const contactId = saveContact._id
-		userData.contacts.push(contactId)
+
+		userData.contacts.push(saveContact._id)
 		await userData.save()
 
-		res.status(200).json({
+		res.status(201).json({
 			success: true,
-			message: `Hello ${userData.fullName}, Contact created successfully!!!`,
-			user: {
-				id: userData._id,
-			},
+			message: `Contact ${saveContact._id} created successfully for ${userData._id}`,
 			contact: {
-				id: contactId,
+				userId: userData._id,
+				contactId: saveContact._id
 			}
 		})
-
 	} catch (error) {
-		return res.status(404).json({
+		res.status(500).json({
 			success: false,
-			message: 'Failed to create contact'
+			message: 'Internal Server Error',
 		});
 	}
-
-
 }
 
 export const deleteContact = async (req, res) => { }
