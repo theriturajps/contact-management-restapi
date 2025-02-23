@@ -11,14 +11,14 @@ const userRouter = Router()
 
 const rateLimiter = createRateLimiter({
 	windowMs: 60 * 1000,    // 1 minute
-	maxRequests: 3,       // limit each IP to 100 requests per window
+	maxRequests: 1,       // limit each IP to 100 requests per window
 	message: 'You have exceeded the request limit. Please wait and try again after 1 minute'
 });
 
 
 userRouter.post('/login', rateLimiter, multerImage.none(), loginController)
 userRouter.post('/signup', rateLimiter, multerImage.single('profileImage'), signupController)
-userRouter.post('/newtoken', checkAuthToken, newRefreshTokens) // renew refresh token
+userRouter.post('/newtoken', rateLimiter, checkAuthToken, newRefreshTokens) // renew refresh token
 
 userRouter.delete('/delete', checkAuthToken, deleteUserController)
 
