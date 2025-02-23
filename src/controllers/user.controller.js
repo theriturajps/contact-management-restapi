@@ -3,12 +3,12 @@ import { generateAccessTokens, generateRefreshTokens } from "../utils/generateTo
 import { User } from "../models/user.model.js"
 
 export const deleteUserController = async (req, res) => {
-	const userId = req.userData.userId
+	const userId = req.userData?.userId // from middleware
 	const userData = await User.findById(userId)
 
 	try {
 		if (!userData) return res.status(404).json({ message: `User with ID ${userId} does not exists.` });
-		if (userData.whatRole !== 'masterAdmin') return res.status(401).json({ success: false, message: 'You are not authorized to perform this action. This require Admin Authorization.' });
+		// if (userData.whatRole !== 'masterAdmin') return res.status(401).json({ success: false, message: 'You are not authorized to perform this action. This require Admin Authorization.' });
 		await userData.deleteOne({ _id: userId })
 		res.json({ message: `User with ID ${userId} deleted successfully.` });
 	} catch (error) {

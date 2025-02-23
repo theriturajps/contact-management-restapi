@@ -16,7 +16,7 @@ The **Contact Management REST API** provides a simple and secure way to manage u
 - ➽ **POST** `/login` **➠** User login
 - ➽ **POST** `/signup` **➠** User registration
 - ➽ **POST** `/newtoken` 🔒 **➠** Renew the access token
-- ➽ **DELETE** `/delete` 🔒 **➠** Delete user from database
+- ➽ **DELETE** `/delete` 🔒 **➠** Delete account from database
 
 ### 📋 Contact Management
 
@@ -26,7 +26,7 @@ The **Contact Management REST API** provides a simple and secure way to manage u
 
 - ➽ **GET** `/all` 🔒 **➠** Fetch all contact details
 - ➽ **POST** `/new` 🔒 **➠** Create a new contact for user
-- ➽ **DELETE** `/:id` 🔒 **➠** Delete a contact
+- ➽ **DELETE** `/:id/delete` 🔒 **➠** Delete a contact
 - ➽ **PATCH** `/:id` 🔒 **➠** Update a contact
 
 ---
