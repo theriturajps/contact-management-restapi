@@ -89,42 +89,49 @@ export const deleteContact = async (req, res) => {
 	const userId = req.userData?.userId;
 	const contactId = req.params.id;
 
-	if (!userId) {
-		return res.status(401).json({
-			success: false,
-			message: 'Invalid Access Token',
-		});
-	}
-
-	const userData = await User.findById(userId).select("-password -whatRole -refreshToken -phoneNumber -email")
-
-	if (!userData) {
-		return res.status(404).json({
-			success: false,
-			message: 'Sorry!!! User not found',
-		});
-	}
-
-	if (!userData.contacts.includes(contactId)) {
-		return res.status(404).json({
-			success: false,
-			message: `Sorry!!! Contact with ID ${contactId} not found`,
-		});
-	}
-
-	const deletedContact = await Contact.findByIdAndDelete(contactId)
-	const DeletedUserContact = await User.findByIdAndUpdate(userId, { $pull: { contacts: contactId } })
-
-	res.json({
-		success: true,
-		totalUserContacts: DeletedUserContact.contacts.length,
-		message: `Contact with ID ${contactId} deleted successfully.`,
-		deletedContactDetails: {
-			id: deletedContact._id,
-			name: deletedContact.fullName,
-			phoneNumber: deletedContact.phoneNumber
+	try {
+		if (!userId) {
+			return res.status(401).json({
+				success: false,
+				message: 'Invalid Access Token',
+			});
 		}
-	});
+
+		const userData = await User.findById(userId).select("-password -whatRole -refreshToken -phoneNumber -email")
+
+		if (!userData) {
+			return res.status(404).json({
+				success: false,
+				message: 'Sorry!!! User not found',
+			});
+		}
+
+		if (!userData.contacts.includes(contactId)) {
+			return res.status(404).json({
+				success: false,
+				message: `Sorry!!! Contact with ID ${contactId} not found`,
+			});
+		}
+
+		const deletedContact = await Contact.findByIdAndDelete(contactId)
+		const DeletedUserContact = await User.findByIdAndUpdate(userId, { $pull: { contacts: contactId } })
+
+		res.json({
+			success: true,
+			totalUserContacts: DeletedUserContact.contacts.length,
+			message: `Contact with ID ${contactId} deleted successfully.`,
+			deletedContactDetails: {
+				id: deletedContact._id,
+				name: deletedContact.fullName,
+				phoneNumber: deletedContact.phoneNumber
+			}
+		});
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: error.message,
+		});
+	}
 
 }
 
