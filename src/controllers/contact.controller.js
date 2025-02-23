@@ -45,39 +45,42 @@ export const getAllContact = async (req, res) => {
 };
 
 export const createNewContent = async (req, res) => {
-	const { contactName, contactNumber, contactEmail, contactPincode, contactGender, contactProfileImage } = req.body
+	
 	const userId = req.userData?.userId;
 
 	const userData = await User.findById(userId).select("-password -whatRole -refreshToken -phoneNumber -email")
 
 	const newContact = {
-		fullName: contactName,
-		email: contactEmail,
-		phoneNumber: contactNumber,
-		pincode: contactPincode,
-		gender: contactGender,
-		profileimg: contactProfileImage
+		fullName: req.body.contactName,
+		phoneNumber: req.body.contactNumber,
+		email: req.body.contactEmail,
+		pincode: req.body.contactPincode,
+		gender: req.body.contactGender,
+		profileimg: req.body.contactProfileImage || "https://res.cloudinary.com/dgsigmemf/image/upload/v1739280154/user-image/default.png"
 	}
 
 	try {
 		const saveContact = new Contact(newContact)
 		await saveContact.save()
 
-		userData.contacts.push(saveContact)
+		userData.contacts.push(saveContact._id)
 		await userData.save()
 
 		res.status(201).json({
 			success: true,
-			message: `Contact ${saveContact._id} created successfully for ${userData._id}`,
+			message: `Contact created successfully for ${userData._id}`,
 			contact: {
-				userId: userData._id,
-				contactId: saveContact._id
+				id: saveContact._id,
+				name: saveContact.fullName,
+				phoneNumber: saveContact.phoneNumber,
+				email: saveContact.email,
+				pincode: saveContact.pincode
 			}
 		})
 	} catch (error) {
 		res.status(500).json({
 			success: false,
-			message: 'Internal Server Error',
+			message: 'Internal Server Error : ' + error.message,
 		});
 	}
 }
