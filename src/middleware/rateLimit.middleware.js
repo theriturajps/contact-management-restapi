@@ -1,64 +1,83 @@
-const rateLimitStore = new Map();
+// Custom rate limiter using in-memory storage
+class RateLimiter {
+	constructor() {
+		this.requests = new Map();
+
+		// Clean up expired entries every 5 minutes
+		setInterval(() => {
+			const now = Date.now();
+			for (const [key, value] of this.requests.entries()) {
+				if (now > value.resetTime) {
+					this.requests.delete(key);
+				}
+			}
+		}, 5 * 60 * 1000);
+	}
+
+	// Get client IP from request
+	getClientIdentifier(req) {
+		return req.ip ||
+			req.connection.remoteAddress ||
+			req.headers['x-forwarded-for'];
+	}
+}
 
 /**
- * Advanced Rate Limiting Middleware
- * @param {Object} options - Configuration options
- * @param {number} options.windowMs - Time window in milliseconds (e.g., 60000 for 1 minute)
- * @param {number} options.maxRequests - Maximum number of requests allowed in the window
- * @param {Function} options.keyGenerator - Function to generate a unique key for rate limiting (default: IP-based)
- * @param {Function} options.handler - Function to handle rate limit exceeded responses
- * @param {Function} options.onLimitReached - Callback function when rate limit is reached
- * @param {boolean} options.trustProxy - Whether to trust proxy headers for IP (default: false)
- * @returns {Function} Express middleware
+ * Creates a rate limiter middleware
+ * @param {Object} options Rate limiter options
+ * @param {number} options.windowMs Time window in milliseconds
+ * @param {number} options.maxRequests Maximum requests allowed in the time window
+ * @param {string} options.message Custom error message
+ * @returns {Function} Express middleware function
  */
 
-
-const rateLimit = (options = {}) => {
+export const createRateLimiter = (options = {}) => {
 	const {
-		windowMs = 60 * 1000, // 1 minute
-		maxRequests = 100, // 100 requests per window
-		keyGenerator = (req) => (options.trustProxy ? req.ip : req.connection.remoteAddress), // Default: IP-based
-		handler = (req, res) => res.status(429).json({ message: 'Too many requests, please try again later.' }),
-		onLimitReached = (key) => console.log(`Rate limit reached for key: ${key}`),
-		trustProxy = false, // Trust proxy headers for IP address (X-Forwarded-For)
+		windowMs = 60 * 1000, // default: 1 minute
+		maxRequests = 100,    // default: 100 requests per window
+		message = 'Too many requests, Please try again later.'
 	} = options;
 
-	return (req, res, next) => {
-		const key = keyGenerator(req);
+	const limiter = new RateLimiter();
 
-		// Initialize the store for the key if it doesn't exist
-		if (!rateLimitStore.has(key)) {
-			rateLimitStore.set(key, {
+	return (req, res, next) => {
+		const clientId = limiter.getClientIdentifier(req);
+		const now = Date.now();
+
+		// Get or create client's request record
+		let clientRequests = limiter.requests.get(clientId);
+
+		if (!clientRequests) {
+			clientRequests = {
 				count: 0,
-				windowStart: Date.now(),
+				resetTime: now + windowMs
+			};
+			limiter.requests.set(clientId, clientRequests);
+		}
+
+		// Reset count if time window has passed
+		if (now > clientRequests.resetTime) {
+			clientRequests.count = 0;
+			clientRequests.resetTime = now + windowMs;
+		}
+
+		// Increment request count
+		clientRequests.count++;
+
+		// Set rate limit headers
+		res.setHeader('X-RateLimit-Limit', maxRequests);
+		res.setHeader('X-RateLimit-Remaining', Math.max(0, maxRequests - clientRequests.count));
+		res.setHeader('X-RateLimit-Reset', Math.ceil(clientRequests.resetTime / 1000));
+
+		// Check if rate limit is exceeded
+		if (clientRequests.count > maxRequests) {
+			return res.status(429).json({
+				error: 'Too many requests, Please try again later.',
+				message: message,
+				retryAfter: Math.ceil((clientRequests.resetTime - now) / 1000)
 			});
 		}
 
-		const currentTime = Date.now();
-		const rateLimitData = rateLimitStore.get(key);
-
-		// Reset the window if the time has expired
-		if (currentTime - rateLimitData.windowStart > windowMs) {
-			rateLimitData.count = 0;
-			rateLimitData.windowStart = currentTime;
-		}
-
-		// Increment the request count
-		rateLimitData.count += 1;
-
-		// Check if the rate limit is exceeded
-		if (rateLimitData.count > maxRequests) {
-			onLimitReached(key);
-			return handler(req, res);
-		}
-
-		// Set rate limit headers in the response
-		res.setHeader('X-RateLimit-Limit', maxRequests);
-		res.setHeader('X-RateLimit-Remaining', Math.max(0, maxRequests - rateLimitData.count));
-		res.setHeader('X-RateLimit-Reset', Math.ceil((rateLimitData.windowStart + windowMs) / 1000));
-
 		next();
 	};
-}
-
-export { rateLimit };
+};
