@@ -118,7 +118,6 @@ export const deleteContact = async (req, res) => {
 
 		res.json({
 			success: true,
-			totalUserContacts: DeletedUserContact.contacts.length,
 			message: `Contact with ID ${contactId} deleted successfully.`,
 			deletedContactDetails: {
 				id: deletedContact._id,
