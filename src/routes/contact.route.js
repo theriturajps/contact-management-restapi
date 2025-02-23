@@ -5,11 +5,13 @@ import { Router } from "express"
 
 const contactRouter = Router()
 
+// api/v1/contact
+
 contactRouter.get('/all', checkAuthToken, getAllContact) // contacts by id
 
 contactRouter.post('/new', checkAuthToken, multerImage.none(), createNewContent) // create new contact for the user id
 
-contactRouter.delete('/:id', deleteContact) // delete the contact
+contactRouter.delete('/:id/delete', checkAuthToken, deleteContact) // delete the contact
 
 contactRouter.patch('/:id', updatedContact) // update the contact
 
