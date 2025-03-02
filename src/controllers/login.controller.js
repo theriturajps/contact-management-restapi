@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt"
 import { User } from "../models/user.model.js"
+import { sendMail } from "../utils/nodeMailer.utils.js"
 import { generateAccessTokens, generateRefreshTokens } from "../utils/generateToken.utils.js"
 
 export const loginController = async (req, res) => {
@@ -40,6 +41,33 @@ export const loginController = async (req, res) => {
 
 		userData.refreshToken = refreshWalaToken
 		await userData.save({ validateBeforeSave: false })
+
+		sendMail(
+			userEmail,
+			'New Login Detected | Contact Management',
+			`<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; padding:20px;">
+				<h2 style="color:#333;">Hi ${userName}!</h2>
+				<p style="color:#666; line-height:1.5;">
+					We detected a login to your account from:<br>
+					• Device: ${deviceType}<br>
+					• Location: ${location}<br>
+					• Time: ${loginTime}
+				</p>
+				<a href="${process.env.APP_URL}/account/security" 
+					style="display:block; width:200px; margin:20px auto; padding:12px; 
+									text-align:center; background:#007bff; color:white; 
+									text-decoration:none; border-radius:5px;">
+					Review Activity
+				</a>
+				<p style="color:#666; font-size:14px;">
+					Not you? Please <a href="${process.env.APP_URL}/reset-password" style="color:#007bff;">reset your password</a> immediately.
+				</p>
+				<p style="color:#999; font-size:12px; text-align:center; border-top:1px solid #eee; padding-top:15px; margin-top:25px;">
+					<a href="${process.env.APP_URL}/unsubscribe" style="color:#999;">Unsubscribe</a> | 
+					<a href="${process.env.APP_URL}/privacy" style="color:#999;">Privacy</a>
+				</p>
+			</div>`
+		);
 
 		const cookieOptions = {
 			httpOnly: true,
