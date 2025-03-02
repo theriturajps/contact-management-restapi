@@ -5,7 +5,17 @@ const transporter = nodemailer.createTransport({
 	port: 465,
 	secure: true, // true for port 465, false for other ports
 	auth: {
-		user: "maddison53@ethereal.email",
-		pass: "jn7jnAPss4f63QBp6D",
+		user: process.env.MAIL_AUTH_USER,
+		pass: process.env.MAIL_AUTH_PASS,
 	},
 });
+
+export const sendMail = async (mailOptions) => {
+	try {
+		const info = await transporter.sendMail(mailOptions);
+		console.log("Message sent: %s", info.messageId);
+	} catch (error) {
+		console.log(error);
+	}
+};
+
