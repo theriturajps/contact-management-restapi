@@ -6,6 +6,7 @@ import { generateAccessTokens, generateRefreshTokens } from "../utils/generateTo
 export const loginController = async (req, res) => {
 
 	const { email, password } = req.body
+	const userAgent = req.headers["user-agent"];
 
 	if (!email || !password) {
 		return res.status(401).json({
@@ -43,31 +44,38 @@ export const loginController = async (req, res) => {
 		await userData.save({ validateBeforeSave: false })
 
 		sendMail(
-			userEmail,
+			userData.email,
 			'New Login Detected | Contact Management',
-			`<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; padding:20px;">
-				<h2 style="color:#333;">Hi ${userName}!</h2>
-				<p style="color:#666; line-height:1.5;">
-					We detected a login to your account from:<br>
-					• Device: ${deviceType}<br>
-					• Location: ${location}<br>
-					• Time: ${loginTime}
-				</p>
-				<a href="${process.env.APP_URL}/account/security" 
-					style="display:block; width:200px; margin:20px auto; padding:12px; 
-									text-align:center; background:#007bff; color:white; 
-									text-decoration:none; border-radius:5px;">
-					Review Activity
-				</a>
-				<p style="color:#666; font-size:14px;">
-					Not you? Please <a href="${process.env.APP_URL}/reset-password" style="color:#007bff;">reset your password</a> immediately.
-				</p>
-				<p style="color:#999; font-size:12px; text-align:center; border-top:1px solid #eee; padding-top:15px; margin-top:25px;">
-					<a href="${process.env.APP_URL}/unsubscribe" style="color:#999;">Unsubscribe</a> | 
-					<a href="${process.env.APP_URL}/privacy" style="color:#999;">Privacy</a>
-				</p>
-			</div>`
-		);
+			`<div style="max-width:400px; margin:10px auto; font-family:Arial, sans-serif; padding:15px; border:1px solid #eee; border-radius:5px; box-shadow:0 1px 5px rgba(0,0,0,0.05);">
+				<h3 style="color:#333; margin-top:0; margin-bottom:10px;">New Login Detected</h3>
+				<p style="color:#555; margin:5px 0;">Hi ${userData.fullName},</p>
+				<p style="color:#555; margin:5px 0;">We detected a login from:</p>
+				<div style="background:#f8f9fa; padding:10px; border-radius:4px; margin:10px 0;">
+						<p style="color:#555; margin:0; font-size:13px;">
+								<strong>Device:</strong> ${userAgent}<br>
+								<strong>Time:</strong> ${new Date().toGMTString()}
+						</p>
+				</div>
+				<p style="color:#555; margin:5px 0; font-size:13px;">If this was you, no action needed. Otherwise, secure your account now.</p>
+				<div style="text-align:center; margin:15px 0;">
+						<a href="/account/security" style="display:inline-block; padding:8px 16px; background:#0066cc; color:white; text-decoration:none; border-radius:3px; font-size:13px;">Review Activity</a>
+				</div>
+				<div style="background:#fff8f8; border-left:3px solid #ff3b30; padding:8px; margin:10px 0;">
+						<p style="color:#d32f2f; margin:0; font-size:12px;">
+								<strong>Not you?</strong> <a href="/reset-password" style="color:#d32f2f;">Reset password</a> and <a href="/support" style="color:#d32f2f;">contact support</a>.
+						</p>
+				</div>
+				<div style="color:#999; font-size:11px; text-align:center; border-top:1px solid #eee; padding-top:8px; margin-top:15px;">
+						<p style="margin:5px 0;">Automated security notification. Do not reply.</p>
+						<p style="margin:5px 0;">
+								<a href="/account/preferences" style="color:#777; margin:0 5px;">Preferences</a>
+								<a href="/privacy" style="color:#777; margin:0 5px;">Privacy</a>
+								<a href="/help" style="color:#777; margin:0 5px;">Help</a>
+						</p>
+						<p style="margin:5px 0;">© 2025 Contact Management. All rights reserved.</p>
+				</div>
+		</div>`
+		)
 
 		const cookieOptions = {
 			httpOnly: true,
