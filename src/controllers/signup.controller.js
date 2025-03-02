@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import { cloudinaryUpload } from "../utils/cloudinaryUpload.utils.js"
 import { User } from "../models/user.model.js"
+import { sendMail } from "../utils/nodeMailer.utils.js"
 
 const saltrounds = Number(process.env.BCRYPT_SALT_ROUND)
 
@@ -50,6 +51,20 @@ export const signupController = async (req, res) => {
 	try {
 		const saveUserData = await User(userData)
 		saveUserData.save()
+
+		sendMail(
+			userData.email,
+			'User Registration Successful | Contact Management',
+			`
+				<div style="max-width:600px; margin:20px auto; font-family:Arial, sans-serif; padding:20px;">
+					<h2 style="color:#333;">Welcome, ${userData.fullName}!</h2>
+					<p style="color:#666; line-height:1.5;">
+						Your account has been successfully created.<br>
+						Start managing your contacts now:
+					</p>
+				</div>
+			`
+		);
 
 		res.status(200).json({
 			success: true,
